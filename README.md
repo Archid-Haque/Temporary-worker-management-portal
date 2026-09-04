@@ -55,28 +55,7 @@ Suggested repository name:
 
 `temporary-worker-management-portal`
 
-Suggested commit sequence for the hackathon:
-
-### Commit 1 — Initial MVP
-- Added responsive dashboard
-- Added work record creation
-- Added rate and payment calculation
-- Added record history
-
-### Commit 2 — Confirmation & dispute flow
-- Added record confirmation/lock state
-- Added dispute flag
-- Added role selector
-- Added summary statistics
-
-### Commit 3 — Challenge Card: Print-Friendly Summary
-- Added dedicated print-friendly record summary
-- Removed browser/app controls from printed output
-- Added calculation breakdown and history to print view
-- Tested print preview on a useful work record
-
-## Suggested demo flow
-
+## Demo-flow
 1. Create a new worker work record.
 2. Enter task, date, rate and units.
 3. Add extra work, advance and partial payment.
