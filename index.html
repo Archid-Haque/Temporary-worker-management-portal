@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorkerLedger — Temporary Worker Records</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">WL</span><div><strong>WorkerLedger</strong><small>Temporary Worker Records</small></div></div>
+  <div class="role-switch"><label>View as</label><select id="roleSelect"><option>Employer</option><option>Worker</option><option>Supervisor</option><option>Administrator</option></select></div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div><p class="eyebrow">WEB08 • MVP</p><h1>Work, attendance & payment records</h1><p class="muted">A clear shared record of assigned work, confirmed attendance and payment calculations.</p></div>
+    <button class="primary" id="addRecordBtn">+ New work record</button>
+  </section>
+
+  <section class="stats">
+    <article><span>Active records</span><b id="statRecords">0</b></article>
+    <article><span>Pending amount</span><b id="statPending">₹0</b></article>
+    <article><span>Disputes</span><b id="statDisputes">0</b></article>
+    <article><span>Confirmed</span><b id="statConfirmed">0</b></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><div><h2>Work records</h2><p class="muted">Each record keeps the calculation and its history together.</p></div>
+    <input id="search" class="search" placeholder="Search worker, employer or task…"></div>
+    <div id="records"></div>
+  </section>
+
+  <section class="panel info-grid">
+    <div><h3>Required flow</h3><ol><li>Record task, date and agreed rate.</li><li>Employer records attendance.</li><li>Worker confirms or disputes it.</li><li>Add overtime, extra work, advances and partial payments.</li><li>Show earned − advances − completed payments = pending.</li></ol></div>
+    <div class="rule"><h3>Important rule</h3><p>Confirmed records are locked against silent changes. Both sides see the same history. This is a record-keeping tool, not a payment service or legal dispute authority.</p></div>
+  </section>
+</main>
+
+<div class="modal hidden" id="recordModal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>New work record</h2><button class="icon" data-close>×</button></div>
+    <form id="recordForm">
+      <div class="form-grid">
+        <label>Worker<input name="worker" required placeholder="e.g. Rahim Ali"></label>
+        <label>Employer<input name="employer" required placeholder="e.g. ABC Contractor"></label>
+        <label>Task<input name="task" required placeholder="e.g. Brick work"></label>
+        <label>Date<input name="date" type="date" required></label>
+        <label>Rate type<select name="rateType"><option>Daily</option><option>Per task</option></select></label>
+        <label>Agreed rate (₹)<input name="rate" type="number" min="0" required></label>
+        <label>Days / tasks completed<input name="units" type="number" min="0" step="0.5" value="1" required></label>
+        <label>Overtime / extra work (₹)<input name="extra" type="number" min="0" value="0"></label>
+        <label>Advance (₹)<input name="advance" type="number" min="0" value="0"></label>
+        <label>Completed payment (₹)<input name="paid" type="number" min="0" value="0"></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="secondary" data-close>Cancel</button><button class="primary">Create record</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="detailModal">
+  <div class="modal-card large" id="detailContent"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

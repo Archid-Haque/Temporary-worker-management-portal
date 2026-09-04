@@ -1,0 +1,31 @@
+const KEY="workerLedgerRecords";
+const seed=[{id:crypto.randomUUID(),worker:"Rahim Ali",employer:"ABC Contractor",task:"Brick work",date:new Date().toISOString().slice(0,10),rateType:"Daily",rate:650,units:3,extra:150,advance:500,paid:800,status:"Confirmed",dispute:false,history:["Record created","Attendance confirmed by employer","Attendance confirmed by worker","₹800 payment recorded"]}];
+let records=JSON.parse(localStorage.getItem(KEY)||"null")||seed;
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+function save(){localStorage.setItem(KEY,JSON.stringify(records));render()}
+function calc(r){return {earned=(r.rate*r.units),total=(r.rate*r.units+r.extra),pending=(r.rate*r.units+r.extra-r.advance-r.paid)}}
+function money(n){return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(n)}
+function render(){
+ const q=$("#search").value.toLowerCase();
+ const list=records.filter(r=>[r.worker,r.employer,r.task].some(x=>x.toLowerCase().includes(q)));
+ $("#records").innerHTML=list.length?list.map(r=>{let c=calc(r);return `<div class="record">
+ <div><div class="record-title">${r.task}</div><div class="record-meta">${r.worker} • ${r.employer} • ${r.date}</div></div>
+ <div><span class="badge ${r.dispute?"dispute":""}">${r.dispute?"Dispute flagged":r.status}</span></div>
+ <div class="money">${money(c.pending)} <small class="record-meta">pending</small></div>
+ <button onclick="openDetail('${r.id}')">View record</button></div>`}).join(""):"<p class='muted'>No records found.</p>";
+ $("#statRecords").textContent=records.length;$("#statPending").textContent=money(records.reduce((a,r)=>a+calc(r).pending,0));$("#statDisputes").textContent=records.filter(r=>r.dispute).length;$("#statConfirmed").textContent=records.filter(r=>r.status==="Confirmed").length;
+}
+function openModal(id){$(id).classList.remove("hidden")} function closeModals(){$$(".modal").forEach(m=>m.classList.add("hidden"))}
+$("#addRecordBtn").onclick=()=>openModal("#recordModal");$("#search").oninput=render;
+$$("[data-close]").forEach(b=>b.onclick=closeModals);$$(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)closeModals()});
+$("#recordForm").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const r={id:crypto.randomUUID(),worker:f.get("worker"),employer:f.get("employer"),task:f.get("task"),date:f.get("date"),rateType:f.get("rateType"),rate:+f.get("rate"),units:+f.get("units"),extra:+f.get("extra")||0,advance:+f.get("advance")||0,paid:+f.get("paid")||0,status:"Pending",dispute:false,history:["Record created"]};records.unshift(r);e.target.reset();closeModals();save();};
+window.openDetail=id=>{const r=records.find(x=>x.id===id),c=calc(r);$("#detailContent").innerHTML=`<div class="detail-head"><div><p class="eyebrow">RECORD • ${r.status.toUpperCase()}</p><h2>${r.task}</h2><p class="muted">${r.worker} ↔ ${r.employer} • ${r.date}</p></div><button class="icon" onclick="closeModals()">×</button></div>
+<div class="calc"><div><small>Earned</small><b>${money(c.earned)}</b></div><div><small>Extra work</small><b>${money(r.extra)}</b></div><div><small>Advances + paid</small><b>${money(r.advance+r.paid)}</b></div><div><small>Pending</small><b>${money(c.pending)}</b></div></div>
+<p><b>Rate:</b> ${money(r.rate)} / ${r.rateType.toLowerCase()} × ${r.units}</p>
+<div class="detail-actions">${r.status!=="Confirmed"?`<button class="primary" onclick="confirmRecord('${r.id}')">✓ Confirm record</button>`:"<span class='badge'>✓ Confirmed & locked</span>"} <button class="secondary" onclick="toggleDispute('${r.id}')">${r.dispute?"Clear dispute flag":"⚑ Dispute flag"}</button><button class="secondary" onclick="printRecord('${r.id}')">🖨 Print summary</button></div>
+<div class="history"><h3>Complete record history</h3><ul>${r.history.map(h=>`<li>${h}</li>`).join("")}</ul></div>
+<div class="rule"><b>Calculation:</b> ${money(r.rate)} × ${r.units} + ${money(r.extra)} − ${money(r.advance)} − ${money(r.paid)} = <strong>${money(c.pending)} pending</strong></div>`;openModal("#detailModal")};
+window.confirmRecord=id=>{let r=records.find(x=>x.id===id);if(r.status==="Confirmed")return;r.status="Confirmed";r.history.push("Record confirmed and locked");save();openDetail(id)};
+window.toggleDispute=id=>{let r=records.find(x=>x.id===id);r.dispute=!r.dispute;r.history.push(r.dispute?"Dispute flag added":"Dispute flag cleared");save();openDetail(id)};
+window.printRecord=id=>{const r=records.find(x=>x.id===id),c=calc(r);const w=window.open("","_blank");w.document.write(`<!doctype html><title>Work Record — ${r.worker}</title><style>body{font-family:Arial;max-width:800px;margin:40px auto;color:#073642}h1{margin-bottom:4px}.box{border:1px solid #999;padding:14px;margin:14px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.label{color:#666;font-size:12px}.total{font-size:24px;font-weight:bold}</style><h1>Temporary Worker Work Record</h1><p>Print-friendly summary • ${new Date().toLocaleString()}</p><div class="box"><div class="grid"><div><span class="label">Worker</span><br><b>${r.worker}</b></div><div><span class="label">Employer</span><br><b>${r.employer}</b></div><div><span class="label">Task</span><br><b>${r.task}</b></div><div><span class="label">Date</span><br><b>${r.date}</b></div><div><span class="label">Rate</span><br>${money(r.rate)} / ${r.rateType}</div><div><span class="label">Units</span><br>${r.units}</div></div></div><div class="box"><div class="grid"><div>Earned<br><b>${money(c.earned)}</b></div><div>Extra work<br><b>${money(r.extra)}</b></div><div>Advance<br><b>${money(r.advance)}</b></div><div>Completed payment<br><b>${money(r.paid)}</b></div></div><hr><div class="total">Pending amount: ${money(c.pending)}</div></div><div class="box"><b>Status:</b> ${r.status} ${r.dispute?"• DISPUTE FLAGGED":""}<br><b>History:</b><ul>${r.history.map(h=>`<li>${h}</li>`).join("")}</ul></div><p>This is a record-keeping summary, not a payment service, payroll system or legal dispute authority.</p>`);w.document.close();w.focus();w.print()};
+render();
