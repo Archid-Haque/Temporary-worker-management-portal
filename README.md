@@ -73,9 +73,20 @@ The application supports four roles:
 - Activate/deactivate users
 - Review recent records
 - Review audit activity
+- Customize portal branding
+- Change the portal/site name
+- Upload or remove the portal logo
+
+### Global Branding
+- Admin-controlled site name
+- Custom logo upload and removal
+- Branding applied across the landing page, login, dashboard and record pages
+- When a logo is uploaded, the logo is displayed instead of the site name
+- When no logo is configured, the site name is displayed
+- Branding is also supported in print-friendly summaries
 
 ### Print-Friendly Summary
-Each work record provides a clean print view containing:
+Each work record provides a clean **A4-ready print view** containing:
 
 - Worker and employer details
 - Work information
@@ -83,7 +94,10 @@ Each work record provides a clean print view containing:
 - Payment calculation
 - Pending amount
 - Record status
-- History
+- Recent audit history
+- Portal branding
+
+The summary provides a clean physical record of a work assignment and its payment status.
 
 ---
 
@@ -111,9 +125,10 @@ work_records
 attendance_events
 payment_events
 audit_logs
+site_settings
 ```
 
-The application stores user accounts, work records, attendance events and audit history in the server database rather than browser LocalStorage.
+The application stores user accounts, work records, attendance events, payment information, audit history and portal branding settings in the server database rather than browser LocalStorage.
 
 ---
 
@@ -144,19 +159,23 @@ temporary-worker-management-portal/
 ├── app/
 │   ├── auth.php
 │   ├── config.php.example
-│   └── db.php
+│   ├── db.php
+│   └── site.php
 │
 ├── database/
 │   └── schema.sql
 │
 └── public/
     ├── index.php
+    ├── login.php
     ├── dashboard.php
     ├── admin.php
     ├── record.php
     ├── logout.php
+    ├── setup.php
     └── assets/
-        └── style.css
+        ├── style.css
+        └── uploads/
 ```
 
 ### Configuration
@@ -226,9 +245,33 @@ Completed:
 - Added print-friendly record summaries
 - Added responsive UI and navigation
 - Added footer and polished visual design
+- Added global site branding
+- Added admin-controlled site name
+- Added admin logo upload and removal
+- Applied branding consistently across the portal
+- Added branded print-friendly summaries
 - Deployed the application on CyberPanel/OpenLiteSpeed
 - Connected the live application to MySQL/MariaDB
 - Tested the multi-role workflow across devices/browsers
+
+---
+
+## Record History & Transparency
+
+WorkerLedger maintains an audit trail for important actions so that changes are visible instead of being silently overwritten.
+
+Examples of recorded events include:
+
+```text
+Record created
+Record updated
+Attendance marked
+Attendance confirmed
+Attendance disputed
+Record confirmed & locked
+Record deleted
+User created
+User status changed
 
 ---
 
