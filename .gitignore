@@ -1,0 +1,18 @@
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+
+# Environment / secrets
+app/config.php
+.env
+.env.*
+
+# Server / deployment files
+*.zip
+*.tar
+*.tar.gz
+
+# Temporary files
+*.tmp
+*.bak
